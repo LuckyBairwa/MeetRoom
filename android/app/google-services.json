@@ -1,0 +1,31 @@
+
+
+{
+  "project_info": {
+    "project_number": "934542812712",
+    "project_id": "meetroom-f6216",
+    "storage_bucket": "meetroom-f6216.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:934542812712:android:85b324e209cdb80be5f71d",
+        "android_client_info": {
+          "package_name": "com.meetroom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_KbH6oR7kbzZPAkxD0wN3XvFB_e_c8k0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
