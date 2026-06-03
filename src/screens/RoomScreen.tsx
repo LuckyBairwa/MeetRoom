@@ -224,20 +224,47 @@ const RoomScreen = () => {
   };
 
   const flipCamera = async () => {
+  try {
     const newFacing = facing === 'front' ? 'back' : 'front';
-    setFacing(newFacing);
-    const stream = await mediaDevices.getUserMedia({
-      audio: true,
+
+    // ✅ Pehle existing video track ko directly flip karo
+    const videoTrack = localStream.current?.getVideoTracks()[0];
+    if (videoTrack && videoTrack._switchCamera) {
+      // react-native-webrtc ka built-in flip method
+      videoTrack._switchCamera();
+      setFacing(newFacing);
+      return;
+    }
+
+    // ✅ Fallback — agar _switchCamera nahi kaam kiya
+    const newStream = await mediaDevices.getUserMedia({
+      audio: false, // audio nahi — existing audio track rehne do
       video: { facingMode: newFacing === 'front' ? 'user' : 'environment' },
     });
-    const videoTrack = stream.getVideoTracks()[0];
+
+    const newVideoTrack = newStream.getVideoTracks()[0];
+
+    if (!newVideoTrack) return;
+
+    // Purana video track band karo
+    localStream.current?.getVideoTracks().forEach((t: any) => t.stop());
+
+    // Peers mein replace karo
     Object.values(peers.current).forEach(peer => {
       const sender = peer.getSenders().find(s => s.track?.kind === 'video');
-      if (sender && videoTrack) sender.replaceTrack(videoTrack);
+      if (sender) sender.replaceTrack(newVideoTrack);
     });
-    localStream.current = stream;
-    setLocalStreamState(stream);
-  };
+
+    // Local stream mein replace karo
+    localStream.current?.removeTrack(localStream.current.getVideoTracks()[0]);
+    localStream.current?.addTrack(newVideoTrack);
+    setLocalStreamState(localStream.current);
+    setFacing(newFacing);
+
+  } catch (e) {
+    console.log('Flip error:', e);
+  }
+};
 
   const endCall = () => {
     cleanupCall();
