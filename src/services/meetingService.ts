@@ -21,6 +21,7 @@ export const createMeeting = async (meetingCode: string) => {
   await setDoc(doc(db, 'meetings', meetingCode), {
     meetingId: meetingCode,
     hostId: user.uid,
+    hostname: user.displayName || 'Unknown',
     hostEmail: user.email,
     status: 'active',
     createdAt: serverTimestamp(),

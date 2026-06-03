@@ -102,7 +102,7 @@ const SignupScreen = () => {
     }
 
     try {
-      await signUp(email, password);
+      await signUp(email, password, fullName);
       navigation.replace('Home');
 
       Alert.alert('Success', 'Account Created Successfully');
