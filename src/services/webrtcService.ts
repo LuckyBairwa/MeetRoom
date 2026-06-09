@@ -3,7 +3,6 @@ import {
   RTCPeerConnection,
   RTCSessionDescription,
   MediaStream,
-  RTCIceCandidate,
 } from 'react-native-webrtc';
 
 import {

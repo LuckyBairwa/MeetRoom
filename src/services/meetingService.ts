@@ -155,13 +155,22 @@ export const saveSignal = async (
   meetingId: string,
   fromId: string,
   toId: string,
-  data: object,
+  data: any,
 ) => {
-  await setDoc(
-    doc(db, 'meetings', meetingId, 'signals', `${fromId}_${toId}`),
-    { ...data, updatedAt: serverTimestamp() },
-    { merge: true },
-  );
+  if (data.ice) {
+    await addDoc(collection(db, 'meetings', meetingId, 'iceCandidates'), {
+      ice: data.ice,
+      from: fromId,
+      to: toId,
+      createdAt: serverTimestamp(),
+    });
+  } else {
+    await setDoc(
+      doc(db, 'meetings', meetingId, 'signals', `${fromId}_${toId}`),
+      { ...data, updatedAt: serverTimestamp() },
+      { merge: true },
+    );
+  }
 };
 
 // Apne liye aane wale signals suno
@@ -170,12 +179,12 @@ export const listenSignals = (
   myId: string,
   callback: (fromId: string, data: any) => void,
 ) => {
-  return onSnapshot(
+  const unsubSdp = onSnapshot(
     collection(db, 'meetings', meetingId, 'signals'),
     snapshot => {
       snapshot.docChanges().forEach(change => {
         if (change.type === 'added' || change.type === 'modified') {
-          const key = change.doc.id; // format: "fromId_toId"
+          const key = change.doc.id;
           const [fromId, toId] = key.split('_');
           if (toId === myId) {
             callback(fromId, change.doc.data());
@@ -184,4 +193,23 @@ export const listenSignals = (
       });
     },
   );
+
+  const unsubIce = onSnapshot(
+    collection(db, 'meetings', meetingId, 'iceCandidates' ),
+    snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const data = change.doc.data();
+          if (data.to === myId) {
+            callback(data.from, { ice: data.ice });
+          }
+        }
+      });
+    },
+  );
+
+  return () => {
+    unsubSdp();
+    unsubIce();
+  };
 };

@@ -98,7 +98,7 @@ const HomeScreen = () => {
         <Text style={styles.avatarText}>{firstLetter}</Text>
       </TouchableOpacity>
       <Text style={styles.title}>MeetRoom</Text>
-      <Text style={styles.welcome}>💜Welcome To MeetRoom💜</Text>
+      <Text style={styles.welcome}>💜 Welcome To MeetRoom 💜</Text>
 
       <TouchableOpacity style={styles.actionBtn} onPress={handleJoinByCode}>
         <Text style={styles.actionBtnText}>Join Meeting</Text>
